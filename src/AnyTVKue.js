@@ -1,8 +1,9 @@
 'use strict';
 
-import kue from 'kue';
 import _ from 'lodash';
+import kue from 'kue-scheduler';
 import winston from 'winston';
+import basic_auth from 'basic-auth-connect'
 
 class AnyTVKue {
 
@@ -27,13 +28,40 @@ class AnyTVKue {
 
             createResult.save = function () {
                 createResult.removeOnComplete(!!self.baseConfig.removeOnComplete);
-                createResult._save();
+                createResult._save.apply(this, arguments);
             };
 
             return createResult;
         };
 
         return this.queue;
+    }
+
+    //usages:
+    //  activateUI(app, username, password)(route)
+    //  activateUI(app, authMiddleWare)(route)
+    //  activateUI(app)(route)
+    activateUI (app) {
+        switch(arguments.length) {
+            case 1:
+                return (route) => {
+                    app.use(route, kue.app);
+                }
+            case 2:
+                return (route) => {
+                    route = route || '/kue';
+
+                    app.use(route, arguments[1]);
+                    app.use(route, kue.app);
+                };
+            case 3:
+                return (route) => {
+                    route = route || '/kue';
+
+                    app.use(route, basic_auth(arguments[1], arguments[2]));
+                    app.use(route, kue.app);
+                };
+        }
     }
 
     setup (target, callbacks) {

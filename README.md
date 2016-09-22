@@ -10,11 +10,11 @@ Kue Helper for setup and cleanup of Kue
     ```javascript
         const kue = require('anytv-kue')(config);
     ```
-    
+
 # Added features
 ===
 - Setup kue
-   
+
     ```javascript
     // server.js (before)
     const kue = require('kue')
@@ -52,7 +52,7 @@ Kue Helper for setup and cleanup of Kue
     });
 
     start();
-    
+
     ```
     ```javascript
     // server.js (now)
@@ -61,28 +61,50 @@ Kue Helper for setup and cleanup of Kue
     function start () {
         /* server code */
     }
-    
+
     kue.setup();
 
     start();
-    
+
+    ```
+- Activate UI
+    ```
+        const kue = require('anytv-kue')({removeOnComplete:false});
+        const queue = kue.createQueue();
+        const express = require('express');
+        const app = express();
+
+        //activates UI without auth in `/kue`
+        kue.activateUI(app)();
+        //activates UI in route `/kueapp` without auth
+        kue.activateUI(app)('/kueapp')
+        //activates UI with basic auth in `/kue`
+        kue.activateUI(app, 'username', 'password')();
+        //activates UI with basic auth in `/kueapp`
+        kue.activateUI(app, 'username', 'password')('/kueapp');
+        //activates UI with custom middleware in `/kue`
+        kue.activateUI(app, middleWare)();
+        //activates UI with custom middleware in `/kueapp`
+        kue.activateUI(app, middleWare)('/kueapp');
+
+
     ```
 - Cleanup jobs
-    
+
     ```javascript
       kue.cleanup(job_type, status);
     ```
-    
+
 - Remove jobs on complete
     ```javascript
       // before
       const kue = require('kue');
       const queue = kue.createQueue();
-      
+
       queue.create('name', {})
         .removeOnComplete(true)
         .save()
-      
+
       queue.create('name2', {})
         .removeOnComplete(true)
         .save()
@@ -91,14 +113,14 @@ Kue Helper for setup and cleanup of Kue
       //now
       const kue = require('anytv-kue')({removeOnComplete: true});
       const queue = kue.createQueue();
-      
+
       queue.create('name', {})
         .save()
-      
+
       queue.create('name2', {})
         .save()
     ```
-    
+
 # Available configurations
 
 ## constructor
@@ -117,27 +139,27 @@ kue.setup(queue, callbacks);
     {
       //called when there is an error in redis queue
       error: function (err) {
-      
+
       },
-      
+
       //called when a job failed altogethere after alotted attempts
       failed: function (jobid) {
-      
+
       },
-      
+
       //called when a process SIGTERM occurs
       sigterm: function (sig) {
-      
+
       },
-      
+
       //called upon setup, control what you want to do with active jobs
       active: function (err, ids) {
-      
+
       },
-      
+
       //called upon setup, control what you want to do with inactive jobs
       inactive: function (err, ids) {
-      
+
       }
     }
     ```
