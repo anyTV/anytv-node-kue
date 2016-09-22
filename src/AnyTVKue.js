@@ -1,20 +1,16 @@
 'use strict';
 
 import kue from 'kue';
+import _ from 'lodash';
 import winston from 'winston';
 
 class AnyTVKue {
 
     constructor (config) {
-        this.overridden = ['createQueue'];
-
         this.baseConfig = config || {};
         this.Queue = kue;
-        Object.keys(kue).forEach(key => {
-            if (!~this.overridden.indexOf(key)) {
-                this[key] = kue[key];
-            }
-        });
+
+        _.defaults(this, kue);
     }
 
     createQueue () {
@@ -59,6 +55,7 @@ class AnyTVKue {
             });
         }));
 
+        // requeue all active jobs upon setup
         target.active(callbacks.active || ((err, ids) => {
             ids.forEach(id => {
                 kue.Job.get(id, (_err, job) => {
@@ -67,6 +64,7 @@ class AnyTVKue {
             });
         }));
 
+        // requeue all inactive jobs upon setup
         target.inactive(callbacks.inactive || ((err, ids) => {
             ids.forEach(id => {
                 kue.Job.get(id, (_err, job) => {
