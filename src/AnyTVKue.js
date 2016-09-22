@@ -55,23 +55,18 @@ class AnyTVKue {
             });
         }));
 
-        // requeue all active jobs upon setup
-        target.active(callbacks.active || ((err, ids) => {
-            ids.forEach(id => {
-                kue.Job.get(id, (_err, job) => {
-                    job.inactive();
-                });
-            });
-        }));
+        const status = ['active', 'inactive'];
 
-        // requeue all inactive jobs upon setup
-        target.inactive(callbacks.inactive || ((err, ids) => {
-            ids.forEach(id => {
-                kue.Job.get(id, (_err, job) => {
-                    job.inactive();
+        //requeue all active and inactive jobs
+        status.forEach(stat => {
+            target[stat](callbacks[stat] || ((err, ids) => {
+                ids.forEach(id => {
+                    kue.Job.get(id, (_err, job) => {
+                        job.inactive();
+                    });
                 });
-            });
-        }));
+            }));
+        });
     }
 
     cleanup (job_name, status) {
