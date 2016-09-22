@@ -53,7 +53,7 @@ class AnyTVKue {
 
         process.once('SIGTERM', callbacks.sigterm || (sig => {
             winston.log('SIGTERM', sig);
-            target.shutdown(5000, err => {
+            target.shutdown(this.baseConfig.shutdownTimer || 5000, err => {
                 winston.log('error', 'Kue shutdown:', err );
                 process.exit(0);
             });
