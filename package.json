@@ -1,0 +1,26 @@
+{
+  "name": "anytv-kue",
+  "version": "0.0.1",
+  "description": "kue implementation for any.tv",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "kue-scheduler": "^0.6.0",
+    "lodash": "^4.16.1",
+    "winston": "^2.2.0"
+  },
+  "devDependencies": {
+    "babel": "^6.1.18",
+    "babel-preset-es2015": "^6.1.18",
+    "istanbul": "^0.4.0",
+    "chai": "^3.4.1",
+    "coveralls": "^2.11.4",
+    "esdoc": "^0.4.3",
+    "mocha": "^2.3.3",
+    "mocha-lcov-reporter": "^1.0.0"
+  }
+}
