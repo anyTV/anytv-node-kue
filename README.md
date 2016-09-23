@@ -91,10 +91,24 @@ Kue Helper for setup and cleanup of Kue
 
 
     ```
+- Default Title
+    ```javascript
+        const kue = require('anytv-kue')();
+        const queue = kue.createQueue();
+
+        queue.create('jobtitle', { test: 123 })
+            .save(); //default title will be "{ test: 123 }"
+
+        queue.create('jobtitle', { test: 123, title: '123'})
+            .save(); //title will be "123"
+
+        queue.create('jobtitle')
+            .save(); //title will be "undefined"
+    ```
 - Cleanup jobs
 
     ```javascript
-      kue.cleanup(job_type, status);
+        kue.cleanup(job_type, status);
     ```
 
 - Remove jobs on complete
