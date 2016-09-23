@@ -17,7 +17,8 @@ Kue Helper for setup and cleanup of Kue
 
     ```javascript
     // server.js (before)
-    const kue = require('kue')
+    const kue = require('kue');
+    const queue = kue.createQueue();
 
     function start () {
         /* server code */
@@ -57,18 +58,19 @@ Kue Helper for setup and cleanup of Kue
     ```javascript
     // server.js (now)
     const kue = require('antv-kue')();
+    const queue = kue.createQueue();
 
     function start () {
         /* server code */
     }
 
-    kue.setup();
+    kue.setup(queue);
 
     start();
 
     ```
 - Activate UI
-    ```
+    ```javascript
         const kue = require('anytv-kue')({removeOnComplete:false});
         const queue = kue.createQueue();
         const express = require('express');
@@ -77,7 +79,7 @@ Kue Helper for setup and cleanup of Kue
         //activates UI without auth in `/kue`
         kue.activateUI(app)();
         //activates UI in route `/kueapp` without auth
-        kue.activateUI(app)('/kueapp')
+        kue.activateUI(app)('/kueapp');
         //activates UI with basic auth in `/kue`
         kue.activateUI(app, 'username', 'password')();
         //activates UI with basic auth in `/kueapp`
@@ -103,11 +105,11 @@ Kue Helper for setup and cleanup of Kue
 
       queue.create('name', {})
         .removeOnComplete(true)
-        .save()
+        .save();
 
       queue.create('name2', {})
         .removeOnComplete(true)
-        .save()
+        .save();
     ```
     ```javascript
       //now
@@ -115,10 +117,10 @@ Kue Helper for setup and cleanup of Kue
       const queue = kue.createQueue();
 
       queue.create('name', {})
-        .save()
+        .save();
 
       queue.create('name2', {})
-        .save()
+        .save();
     ```
 
 # Available configurations
