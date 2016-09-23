@@ -22,6 +22,13 @@ class AnyTVKue {
         this.queue._create = this.queue.create;
 
         this.queue.create = function () {
+            const params = arguments[1] || {};
+
+            if (!params.title) {
+                params.title = JSON.stringify(params);
+                arguments[1] = params;
+            }
+
             const createResult = self.queue._create.apply(this, arguments);
 
             createResult._save = createResult.save;
