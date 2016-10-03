@@ -19,6 +19,10 @@ class AnyTVKue {
 
         this.queue = kue.createQueue();
 
+        if (this.queue.create.isCustom) {
+            return this.queue;
+        }
+
         this.queue._create = this.queue.create;
 
         this.queue.create = function () {
@@ -40,6 +44,8 @@ class AnyTVKue {
 
             return createResult;
         };
+
+        this.queue.create.isCustom = true;
 
         return this.queue;
     }

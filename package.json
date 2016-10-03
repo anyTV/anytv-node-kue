@@ -1,6 +1,6 @@
 {
   "name": "anytv-kue",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "kue implementation for any.tv",
   "main": "index.js",
   "scripts": {
