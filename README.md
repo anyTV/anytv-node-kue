@@ -179,3 +179,25 @@ kue.setup(queue, callbacks);
       }
     }
     ```
+
+#How To's
+
+## Update Delayed jobs
+```javascript
+    'use strict';
+
+    const kue = require('kue');
+    const queue = kue.createQueue();
+
+    queue.delayed(function (err, selectedJobs) {
+        selectedJobs.forEach(function (id) {
+            kue.Job.get(id, function (err, job) {
+                if (!job.removeOnComplete()) {
+                    job.removeOnComplete(true).update();
+                }
+            });
+        });
+    });
+```
+    
+`.update()` on a `Job` object will update it. this is an undocumented of [Kue](http://automattic.github.io/kue/)
