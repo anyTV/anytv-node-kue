@@ -1,14 +1,15 @@
 'use strict';
 
 import _ from 'lodash';
-import kue from 'kue-scheduler';
 import winston from 'winston';
+import baseConfig from './config';
+import kue from 'kue-scheduler';
 import basic_auth from 'basic-auth-connect'
 
 class AnyTVKue {
 
     constructor (config) {
-        this.baseConfig = config || {};
+        _.assign(baseConfig, baseConfig, config || {});
         this.Queue = kue;
 
         _.defaults(this, kue);
@@ -38,7 +39,7 @@ class AnyTVKue {
             createResult._save = createResult.save;
 
             createResult.save = function () {
-                createResult.removeOnComplete(!!self.baseConfig.removeOnComplete);
+                createResult.removeOnComplete(!!baseConfig.removeOnComplete);
                 createResult._save.apply(this, arguments);
             };
 
@@ -90,7 +91,7 @@ class AnyTVKue {
 
         process.once('SIGTERM', callbacks.sigterm || (sig => {
             winston.log('SIGTERM', sig);
-            target.shutdown(this.baseConfig.shutdownTimer || 5000, err => {
+            target.shutdown(baseConfig.shutdownTimer || 5000, err => {
                 winston.log('error', 'Kue shutdown:', err );
                 process.exit(0);
             });
@@ -118,6 +119,10 @@ class AnyTVKue {
                 });
             }
         });
+    }
+
+    getConfig() {
+        return baseConfig;
     }
 }
 

@@ -1,6 +1,6 @@
 {
   "name": "anytv-kue",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "kue implementation for any.tv",
   "main": "index.js",
   "scripts": {
@@ -9,7 +9,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "kue-scheduler": "^0.6.0",
+    "basic-auth-connect": "^1.0.0",
+    "kue-scheduler": "^0.6.3",
     "lodash": "^4.16.1",
     "winston": "^2.2.0"
   },
