@@ -9,16 +9,15 @@ import basic_auth from 'basic-auth-connect'
 class AnyTVKue {
 
     constructor (config) {
-        _.assign(baseConfig, baseConfig, config || {});
-        this.Queue = kue;
-
+        _.merge(baseConfig, config || {});
         _.defaults(this, kue);
     }
 
-    createQueue () {
+    createQueue (options) {
         const self = this;
+        options = options || {};
 
-        this.queue = kue.createQueue();
+        this.queue = kue.createQueue(options);
 
         if (this.queue.create.isCustom) {
             return this.queue;
@@ -39,7 +38,7 @@ class AnyTVKue {
             createResult._save = createResult.save;
 
             createResult.save = function () {
-                createResult.removeOnComplete(!!baseConfig.removeOnComplete);
+                createResult.removeOnComplete(options.remove_on_complete || baseConfig.remove_on_complete);
                 createResult._save.apply(this, arguments);
             };
 

@@ -1,5 +1,5 @@
 'use strict';
 
 export default {
-    removeOnComplete: false
+    remove_on_complete: true
 }

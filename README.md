@@ -3,21 +3,23 @@
 Kue Helper for setup and cleanup of Kue
 
 # Changes to be made to old codes
-===
 
 1. Replace all `require('kue');` with
+1. **NOTE:** Define namespace when calling createQueue to ensure properly scheduling for multiple applications. ex
 
     ```javascript
-        const kue = require('anytv-kue')(config);
+        const kue = require('anytv-kue')();
+        const queue = kue.createQueue({
+            prefix: 'namespace'
+        });
     ```
 
 # Added features
-===
 - Setup kue
 
     ```javascript
     // server.js (before)
-    const kue = require('kue');
+    const kue = require('anytv-kue')();
     const queue = kue.createQueue();
 
     function start () {
@@ -71,8 +73,8 @@ Kue Helper for setup and cleanup of Kue
     ```
 - Activate UI
     ```javascript
-        const kue = require('anytv-kue')({removeOnComplete:false});
-        const queue = kue.createQueue();
+        const kue = require('anytv-kue')();
+        const queue = kue.createQueue({remove_on_complete:false});
         const express = require('express');
         const app = express();
 
@@ -127,8 +129,8 @@ Kue Helper for setup and cleanup of Kue
     ```
     ```javascript
       //now
-      const kue = require('anytv-kue')({removeOnComplete: true});
-      const queue = kue.createQueue();
+      const kue = require('anytv-kue')({shutdownTimer: 10000});
+      const queue = kue.createQueue({remove_on_complete: true});
 
       queue.create('name', {})
         .save();
@@ -140,8 +142,11 @@ Kue Helper for setup and cleanup of Kue
 # Available configurations
 
 ## constructor
-- `removeOnComplete` - will Kue remove data from redis when job is complete
 - `shutdownTimer` - time alotted for graceful shutdown
+
+## options
+- `remove_on_complete` - will Kue remove data from redis when job is complete
+- for other options, check out: https://github.com/lykmapipo/kue-scheduler#options
 
 ## setup
 
