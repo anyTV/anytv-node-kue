@@ -90,8 +90,6 @@ Kue Helper for setup and cleanup of Kue
         kue.activateUI(app, middleWare)();
         //activates UI with custom middleware in `/kueapp`
         kue.activateUI(app, middleWare)('/kueapp');
-
-
     ```
 - Default Title
     ```javascript
@@ -206,3 +204,6 @@ kue.setup(queue, callbacks);
 ```
     
 `.update()` on a `Job` object will update it. this is an undocumented of [Kue](http://automattic.github.io/kue/)
+
+# Contributing Guidelines
+Please read [CONTRIBUTING.md](CONTRIBUTING.md)
