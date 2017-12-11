@@ -4,16 +4,32 @@ import _ from 'lodash';
 import winston from 'winston';
 import baseConfig from './config';
 import kue from 'kue-scheduler';
-import basic_auth from 'basic-auth-connect'
+import basic_auth from 'basic-auth-connect';
 
+/**
+ * AnyTVKue class injects additional helper functions on kue-scheduler
+ * @example
+ * const kue = require('anytv-kue')(config.app.KUE);
+ * const Queue = kue.createQueue(config.app.KUE_OPTIONS);
+ * kue.setup(Queue); // adds error listeners and requeue previous jobs
+ */
 class AnyTVKue {
 
-    constructor (config) {
+    /**
+     * Creates an instance of AnyTVKue class
+     * @param {object} [config] Config object that setups the Queue object
+     */
+    constructor(config) {
         _.merge(baseConfig, config || {});
         _.defaults(this, kue);
     }
 
-    createQueue (options) {
+    /**
+     * Creates a Queue object with specific options
+     * @param {object} [options] Options to be passed to Queue object
+     * @return {object} Queue instance
+     */
+    createQueue(options) {
         const self = this;
         options = options || {};
 
@@ -32,13 +48,15 @@ class AnyTVKue {
                 params.title = JSON.stringify(params);
                 arguments[1] = params;
             }
-
             const createResult = self.queue._create.apply(this, arguments);
 
             createResult._save = createResult.save;
 
             createResult.save = function () {
-                createResult.removeOnComplete(options.remove_on_complete || baseConfig.remove_on_complete);
+                const remove_on_complete = 'remove_on_complete' in options
+                    ? options.remove_on_complete
+                    : baseConfig.remove_on_complete;
+                createResult.removeOnComplete(remove_on_complete);
                 createResult._save.apply(this, arguments);
             };
 
@@ -50,16 +68,28 @@ class AnyTVKue {
         return this.queue;
     }
 
-    //usages:
-    //  activateUI(app, username, password)(route)
-    //  activateUI(app, authMiddleWare)(route)
-    //  activateUI(app)(route)
-    activateUI (app) {
-        switch(arguments.length) {
+    /**
+     * Creates a function that can be used for activating KUE UI app
+     * @param {object} app Express server
+     * @returns {function} function
+     * @example
+     * activateUI(app, username, password)(route)
+     * @example
+     * activateUI(app, authMiddleWare)(route)
+     * @example
+     * activateUI(app)(route)
+     */
+    activateUI(app) {
+
+        if (!app || !_.isFunction(app.use)) {
+            throw new Error('Invalid Argument');
+        }
+
+        switch (arguments.length) {
             case 1:
                 return (route) => {
                     app.use(route, kue.app);
-                }
+                };
             case 2:
                 return (route) => {
                     route = route || '/kue';
@@ -77,7 +107,12 @@ class AnyTVKue {
         }
     }
 
-    setup (target, callbacks) {
+    /**
+     * Setups event listeners and re-queues previous jobs
+     * @param {object} target Queue instance
+     * @param {object} [callbacks] Object containing error, failed, sigterm handlers
+     */
+    setup(target, callbacks) {
         callbacks = callbacks || {};
 
         target.on('error', callbacks.error || (err => {
@@ -91,7 +126,7 @@ class AnyTVKue {
         process.once('SIGTERM', callbacks.sigterm || (sig => {
             winston.log('SIGTERM', sig);
             target.shutdown(baseConfig.shutdownTimer || 5000, err => {
-                winston.log('error', 'Kue shutdown:', err );
+                winston.log('error', 'Kue shutdown:', err);
                 process.exit(0);
             });
         }));
@@ -103,14 +138,21 @@ class AnyTVKue {
             target[stat](callbacks[stat] || ((err, ids) => {
                 ids.forEach(id => {
                     kue.Job.get(id, (_err, job) => {
-                        job.inactive();
+                        if (job) {
+                            job.inactive();
+                        }
                     });
                 });
             }));
         });
     }
 
-    cleanup (job_name, status) {
+    /**
+     * Removes all jobs with specified job_name or status
+     * @param {string} job_name Job name
+     * @param {string} [status='complete'] Job status
+     */
+    cleanup(job_name, status) {
         kue.Job.rangeByType(job_name, status || 'complete', 0, -1, 'asc', (err, selectedJobs) => {
             if (selectedJobs && selectedJobs.length) {
                 selectedJobs.forEach(job => {
@@ -120,6 +162,10 @@ class AnyTVKue {
         });
     }
 
+    /**
+     * Returns config
+     * @return {object} Config object
+     */
     getConfig() {
         return baseConfig;
     }

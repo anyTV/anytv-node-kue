@@ -1,6 +1,6 @@
 lib-cov
 coverage
-doc
+docs
 *.seed
 *.log
 *.csv
@@ -21,3 +21,6 @@ sblm.sublime-workspace
 sample.avi
 lib
 src/test.js
+
+.idea
+package-lock.json
