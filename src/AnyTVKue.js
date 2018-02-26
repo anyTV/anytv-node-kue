@@ -68,15 +68,19 @@ class AnyTVKue {
         /**
          * Patch created job's backoff function to support custom backoff types
          */
-
         let _createJob = this.queue.createJob;
 
         this.queue.createJob = function (name, payload) {
 
             let job = _createJob.call(this, name, payload);
-            let _backoff = job.backoff;
 
             job.backoff = function (backoff_type) {
+
+                // default implementation is a getter when no arguments passed
+                // added for backwards compatibility
+                if (arguments.length === 0) {
+                    return job._backoff;
+                }
 
                 let backoff;
                 switch (backoff_type) {
@@ -103,7 +107,8 @@ class AnyTVKue {
                         break;
                 }
 
-                return _backoff.call(this, backoff);
+                job._backoff = backoff;
+                return job;
             };
 
             return job;
