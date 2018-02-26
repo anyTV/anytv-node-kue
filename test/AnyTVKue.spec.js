@@ -91,7 +91,7 @@ describe('#AnyTVKue', function () {
                 const testJob = queue.createJob('test_job', data)
                     .backoff('fixed_doubling');
 
-                testJob._backoff(0).should.equal(1000 * 60);
+                testJob._backoff(1).should.equal(1000 * 60 * 2);
             });
 
             it('jobs should support a custom doubling backoff based on previous attempt\'s delay', function () {
