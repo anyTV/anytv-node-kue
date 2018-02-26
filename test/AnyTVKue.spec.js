@@ -104,6 +104,7 @@ describe('#AnyTVKue', function () {
                 const testJob = queue.createJob('test_job', data)
                     .backoff('delay_doubling');
 
+                eval(`testJob._backoff = ${testJob._backoff};`); // convert string to function
                 testJob._backoff(1, 2000).should.equal(4000);
             });
 
@@ -117,6 +118,7 @@ describe('#AnyTVKue', function () {
                 const testJob = queue.createJob('test_job', data)
                     .backoff('delay_doubling');
 
+                eval(`testJob._backoff = ${testJob._backoff};`); // convert string to function
                 testJob._backoff(1, 0).should.equal(2000);
             });
 

@@ -99,7 +99,7 @@ class AnyTVKue {
                     // custom exponential based on initial delay
                     // starts at 2 seconds when there's no initial delay
                     case 'delay_doubling':
-                        backoff = (attempts, delay) => delay ? delay * 2 : 2000; // milliseconds
+                        backoff = `(attempts, delay) => delay ? delay * 2 : ${baseConfig.default_delay};`;
                         break;
 
                     default:
