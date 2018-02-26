@@ -65,6 +65,50 @@ class AnyTVKue {
 
         this.queue.create.isCustom = true;
 
+        /**
+         * Patch created job's backoff function to support custom backoff types
+         */
+
+        let _createJob = this.queue.createJob;
+
+        this.queue.createJob = function (name, payload) {
+
+            let job = _createJob.call(this, name, payload);
+            let _backoff = job.backoff;
+
+            job.backoff = function (backoff_type) {
+
+                let backoff;
+                switch (backoff_type) {
+
+                    /**
+                     * Custom callback functions
+                     * Executed by eval() so cannot contain variables i.e. can't use config
+                     * https://github.com/Automattic/kue#failure-backoff
+                     */
+
+                    // 2 mins, 4 mins, 8m mins...
+                    case 'fixed_doubling':
+                        backoff = attempts => Math.pow(2, attempts) * 1000 * 60;
+                        break;
+
+                    // custom exponential based on initial delay
+                    // starts at 2 seconds when there's no initial delay
+                    case 'delay_doubling':
+                        backoff = (attempts, delay) => delay ? delay * 2 : 2000; // milliseconds
+                        break;
+
+                    default:
+                        backoff = backoff_type;
+                        break;
+                }
+
+                return _backoff.call(this, backoff);
+            };
+
+            return job;
+        };
+
         return this.queue;
     }
 
