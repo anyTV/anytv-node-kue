@@ -78,6 +78,52 @@ describe('#AnyTVKue', function () {
 
             queue.cleanup('test_job');
         });
+
+        describe('#createJob', function () {
+
+            it('jobs should support a fixed custom doubling backoff that starts at 2 minutes', function () {
+                const inst = new AnyTVKue();
+                const queue = inst.createQueue();
+                const data = {
+                    a: 1
+                };
+
+                const testJob = queue.createJob('test_job', data)
+                    .backoff('fixed_doubling');
+
+                testJob._backoff(1).should.equal(1000 * 60 * 2);
+            });
+
+            it('jobs should support a custom doubling backoff based on previous attempt\'s delay', function () {
+                const inst = new AnyTVKue();
+                const queue = inst.createQueue();
+                const data = {
+                    a: 1
+                };
+
+                const testJob = queue.createJob('test_job', data)
+                    .backoff('delay_doubling');
+
+                eval(`testJob._backoff = ${testJob._backoff};`); // convert string to function
+                testJob._backoff(1, 2000).should.equal(4000);
+            });
+
+            it('custom delay-based doubling backoff should default to 2 seconds when no initial delay', function () {
+                const inst = new AnyTVKue();
+                const queue = inst.createQueue();
+                const data = {
+                    a: 1
+                };
+
+                const testJob = queue.createJob('test_job', data)
+                    .backoff('delay_doubling');
+
+                eval(`testJob._backoff = ${testJob._backoff};`); // convert string to function
+                testJob._backoff(1, 0).should.equal(2000);
+            });
+
+        });
+
     });
 
     /**

@@ -136,6 +136,28 @@ Kue Helper for setup and cleanup of Kue
       queue.create('name2', {})
         .save();
     ```
+    
+- `fixed_doubling` and `delay_doubling` custom backoffs
+    - fixed_doubling - starts at 2 minutes, then 4, then 8, etc
+    - delay_doubling - starts at initial_delay * 2 (2 seconds if no initial delay)
+    
+    ```javascript
+        const kue = require('anytv-kue')();
+        const queue = kue.createQueue();
+  
+        queue.createJob('jobtitle', { test: 123 })
+            .backoff('fixed_doubling')
+            .save(); // next delay will be 2 minutes
+          
+        queue.createJob('jobtitle', { test: 123 })
+            .delay(1000 * 10) // 10 seconds
+            .backoff('delay_doubling')
+            .save(); // next delay will be 20 seconds
+          
+        queue.createJob('jobtitle', { test: 123 })
+            .backoff('delay_doubling')
+            .save(); // next delay will be 2 seconds
+    ```
 
 # Available configurations
 
