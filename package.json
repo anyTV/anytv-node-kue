@@ -13,7 +13,7 @@
     "LICENSE",
     "README.md",
     "index.js",
-    "lib/"
+    "lib/*"
   ],
   "author": "MCN Freedom Tech Inc. <development@freedom.tm>",
   "license": "MIT",
