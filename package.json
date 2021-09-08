@@ -7,7 +7,8 @@
     "build": "babel src -d lib",
     "docs": "esdoc -c .esdoc.json",
     "prepublish": "npm run build",
-    "test": "npm run build && mocha"
+    "test": "npm run build && mocha",
+    "prepare": "npm run build"
   },
   "files": [
     "LICENSE",
@@ -20,6 +21,7 @@
   "dependencies": {
     "basic-auth-connect": "^1.0.0",
     "kue-scheduler": "^0.7.2",
+    "kue-unique": "1.1.0",
     "lodash": "^4.16.1",
     "winston": "^2.2.0"
   },
